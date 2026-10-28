@@ -25,10 +25,10 @@ export function jsonFailure(params: {
   );
 }
 
-function statusForError(error: unknown) {
-  if (error instanceof ZodError) {
+export function statusForError(error: unknown) {
+  if (error instanceof ZodError || error instanceof SyntaxError) {
     return 400;
   }
 
-  return 400;
+  return 500;
 }

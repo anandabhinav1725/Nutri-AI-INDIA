@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { jsonOk, jsonWithStatus } from "@/lib/api/responses";
+import { jsonOk, jsonWithStatus, statusForError } from "@/lib/api/responses";
 import { logger } from "@/lib/logger";
 import { productEvents, recordProductEvent } from "@/lib/validation/events";
 
@@ -32,6 +32,6 @@ export async function POST(request: Request) {
     return jsonOk({ ok: true });
   } catch (error) {
     logger.error("Correction event failed", error);
-    return jsonWithStatus({ ok: false }, 400);
+    return jsonWithStatus({ ok: false }, statusForError(error));
   }
 }

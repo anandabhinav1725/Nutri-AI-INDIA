@@ -15,15 +15,23 @@ export async function POST(request: Request) {
     });
 
     const elapsedMs = body.startedAt ? Date.now() - new Date(body.startedAt).getTime() : null;
-    await recordProductEvent({
-      browserTesterId: body.testerId,
-      eventName: productEvents.mealConfirmed,
-      metadata: {
-        mealId: meal.id,
-        itemCount: meal.items.length,
-        elapsedMs
-      }
-    });
+    try {
+      await recordProductEvent({
+        browserTesterId: body.testerId,
+        eventName: productEvents.mealConfirmed,
+        metadata: {
+          mealId: meal.id,
+          itemCount: meal.items.length,
+          elapsedMs
+        }
+      });
+    } catch (error) {
+      logger.error("Meal confirmation event failed after persistence", error, {
+        testerId: body.testerId,
+        mealId: meal.id
+      });
+    }
+
     logger.info("Meal confirmed", {
       testerId: body.testerId,
       mealId: meal.id,

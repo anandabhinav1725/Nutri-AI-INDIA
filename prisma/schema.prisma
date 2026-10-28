@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tester {
+  id        String         @id @default(cuid())
+  browserId String         @unique
+  createdAt DateTime       @default(now())
+  meals     Meal[]
+  events    ProductEvent[]
+}
+
+model Meal {
+  id           String     @id @default(cuid())
+  testerId     String
+  inputText    String
+  confirmedAt  DateTime   @default(now())
+  calories     Float
+  proteinGrams Float
+  carbsGrams   Float
+  fatGrams     Float
+  createdAt    DateTime   @default(now())
+  tester       Tester     @relation(fields: [testerId], references: [id])
+  items        MealItem[]
+
+  @@index([testerId, confirmedAt])
+}
+
+model MealItem {
+  id                   String   @id @default(cuid())
+  mealId               String
+  name                 String
+  quantityValue        Float?
+  quantityUnit         String
+  quantityOriginalText String
+  calories             Float
+  proteinGrams         Float
+  carbsGrams           Float
+  fatGrams             Float
+  uncertainty          String
+  assumptions          Json
+  createdAt            DateTime @default(now())
+  meal                 Meal     @relation(fields: [mealId], references: [id])
+
+  @@index([mealId])
+}
+
+model ProductEvent {
+  id        String   @id @default(cuid())
+  testerId  String
+  eventName String
+  metadata  Json
+  createdAt DateTime @default(now())
+  tester    Tester   @relation(fields: [testerId], references: [id])
+
+  @@index([testerId, eventName])
+  @@index([createdAt])
+}
